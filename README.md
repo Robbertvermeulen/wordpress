@@ -63,7 +63,7 @@ volumes:
    * Choose "Trust this certificate for identifying websites"
    * Click "OK"
     
-1. Go to ```https://localhost:5000/
+1. Go to ```https://localhost:5000/```
 
 ## Setting environment variables
 
