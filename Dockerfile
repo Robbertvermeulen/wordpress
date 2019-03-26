@@ -17,8 +17,10 @@ COPY config/localdomain.csr.cnf /etc/apache2/
 COPY config/localdomain.v3.ext /etc/apache2/
 
 # START-UP SCRIPTS
-COPY config/docker-entrypoint.sh /usr/local/bin/
-ENTRYPOINT ["docker-entrypoint.sh"]
+COPY config/user.sh /usr/local/bin
+COPY config/ssl.sh /usr/local/bin
+COPY config/startup.sh /usr/local/bin
+ENTRYPOINT ["startup.sh"]
 CMD ["apache2-foreground"]
 
 # EXPOSE PORTS
