@@ -12,7 +12,7 @@ services:
       MYSQL_PASSWORD: examplepass
       MYSQL_RANDOM_ROOT_PASSWORD: '1'
   wordpress:
-    image: apache-wordpress
+    image: apache-wordpress 
     build: 
       context: .
     restart: unless-stopped
