@@ -4,6 +4,7 @@ FROM wordpress:5.1.1-php7.1-apache
 RUN a2enmod ssl && a2enmod rewrite
 
 # OVERRIDE VIRTUALHOSTS
+ENV APACHE_DOCUMENT_ROOT /var/www/html
 COPY config/httpd-ssl.conf /etc/apache2/conf/extra/httpd-ssl.conf
 COPY config/000-default.conf /etc/apache2/sites-available
 RUN a2ensite 000-default.conf
