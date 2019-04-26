@@ -34,7 +34,7 @@ services:
       SSL_SITE_NAME: Wordpress
       LOCAL_UID: 1000
     ports:
-      - "5000:443"
+      - "4433:443"
       - "8080:80"
     volumes:
      - ./:/var/www/html
