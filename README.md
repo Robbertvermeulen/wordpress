@@ -50,8 +50,8 @@ services:
     restart: unless-stopped
     environment: 
       - MYSQL_ROOT_PASSWORD=password
-      - WORDPRESS_DB_USER=user
-      - WORDPRESS_DB_PASSWORD=password
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=password
       - WORDPRESS_DB_NAME=exampleDatabase
       - SITE_URL=https://example.test
       - SITE_NAME=example
@@ -125,8 +125,8 @@ Traefik describes itself is an open-source reverse proxy/load balancer. We can e
       restart: unless-stopped
       environment: 
       - MYSQL_ROOT_PASSWORD=password
-      - WORDPRESS_DB_USER=user
-      - WORDPRESS_DB_PASSWORD=password
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=password
       - WORDPRESS_DB_NAME=exampleDatabase
       - SITE_URL=https://example.test
       - SITE_NAME=example
@@ -394,9 +394,9 @@ You can then run `docker-compose up --build -d` to build and run your container 
 > Needed so that the Wordpress instance can create database entries.
 * `WORDPRESS_DB_HOST=mysql`
 > *Optional*: The name of our mysql service acts as its hostname. Change this if you have named your service differently or you are running multiple mysql services. Defaults to `mysql`.    
-* `WORDPRESS_DB_USER=user`
+* `MYSQL_USER=user`
 > Needed so that the Wordpress instance can create database entries.
-* `WORDPRESS_DB_PASSWORD=password`
+* `MYSQL_PASSWORD=password`
 > Needed so that the Wordpress instance can create database entries.
 * `WORDPRESS_DB_NAME=exampleDatabase`
 > Creates a database using this name. Grants all privileges to `$MYSQL_USER`.
@@ -472,8 +472,8 @@ services:
     restart: unless-stopped
     environment:
       - MYSQL_ROOT_PASSWORD=password
-      - WORDPRESS_DB_USER=user
-      - WORDPRESS_DB_PASSWORD=password
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=password
       - WORDPRESS_DB_NAME=exampleDatabase
       - SITE_URL=https://example.test
       - SITE_NAME=example
