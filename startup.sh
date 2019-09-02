@@ -1,11 +1,11 @@
 #!/bin/bash
 set -euo pipefail
 
-WORDPRESS_DB_USER=${MYSQL_USER}
-WORDPRESS_DB_HOST=${MYSQL_HOST:-mysql}
-WORDPRESS_DB_PASSWORD=${MYSQL_PASSWORD}
-WORDPRESS_DB_NAME=${MYSQL_DATABASE}
-
+echo 'export WORDPRESS_DB_USER=${MYSQL_USER}' >> ~/.bashrc
+echo 'export WORDPRESS_DB_HOST=${MYSQL_HOST:-mysql}' >> ~/.bashrc
+echo 'export WORDPRESS_DB_PASSWORD=${MYSQL_PASSWORD}' >> ~/.bashrc
+echo 'export WORDPRESS_DB_NAME=${MYSQL_DATABASE}' >> ~/.bashrc
+source ~/.bashrc
 
 if [ ! "$(ls -A /var/www/html/)" ]; then
     mysql_connect_retry () {
