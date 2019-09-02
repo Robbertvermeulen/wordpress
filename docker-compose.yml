@@ -1,35 +1,50 @@
 version: '3.7'
-
 services:
   mysql:
-    image: mysql:5.7
-    restart: unless-stopped
+    image: mysql:8.0
+    restart: always
     volumes:
       - mysql:/var/lib/mysql
     environment:
-      MYSQL_DATABASE: exampledb
-      MYSQL_USER: exampleuser
-      MYSQL_PASSWORD: examplepass
-      MYSQL_RANDOM_ROOT_PASSWORD: '1'
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=password
+    command: --default-authentication-plugin=mysql_native_password
   wordpress:
     image: apache-wordpress 
     build: 
       context: .
-    restart: unless-stopped
+    restart: "no"
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=password
+      - WORDPRESS_DB_HOST=mysql
+      - WORDPRESS_DB_USER=user
+      - WORDPRESS_DB_PASSWORD=password
+      - WORDPRESS_DB_NAME=exampleDatabase
+      - SITE_URL=https://example.test
+      - SITE_NAME=example
+    volumes:
+      - ./wordpress:/var/www/html
+    labels:
+      - traefik.http.routers.example-wordpress1.entrypoints=web
+      - traefik.http.routers.example-wordpress1.rule=Host(
+        `example.test`, `www.example.test`)
+      - traefik.http.routers.example-wordpress1-secure.tls=true
+      - traefik.http.routers.example-wordpress1-secure.entrypoints=web-secure
+      - traefik.http.routers.example-wordpress1-secure.rule=Host(
+        `example.test`, `www.example.test`)
+      - traefik.http.routers.example-wordpress1.middlewares=https
+      - traefik.http.middlewares.https.redirectscheme.scheme=https
+      - traefik.http.services.service1.loadbalancer.server.port=5000
     depends_on: 
       - mysql
-    environment:
-      WORDPRESS_DB_HOST: mysql
-      WORDPRESS_DB_USER: exampleuser
-      WORDPRESS_DB_PASSWORD: examplepass
-      WORDPRESS_DB_NAME: exampledb
-      LOCAL_UID: 1000
-      APACHE_SERVER_NAME: localhost
-      SSL_SITE_NAME: Wordpress
-    ports:
-      - "5000:443"
-      - "8080:80"
-    volumes:
-     - ./:/var/www/html
+    networks:
+      - default
+      - traefik
 volumes: 
   mysql: {}
+networks:
+  traefik:
+    external: true
