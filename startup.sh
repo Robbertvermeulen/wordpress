@@ -16,7 +16,7 @@ if [ ! "$(ls -A /var/www/html/)" ]; then
     }
 
     setup_mysql_database () {
-        mysql -uroot -p${MYSQL_ROOT_PASSWORD} -h${MYSQL_HOST} -e "CREATE DATABASE IF NOT EXISTS ${MYSQL_NAME}"
+        mysql -uroot -p${MYSQL_ROOT_PASSWORD} -h${MYSQL_HOST} -e "CREATE DATABASE IF NOT EXISTS ${MYSQL_DATABASE}"
         mysql -uroot -p${MYSQL_ROOT_PASSWORD} -h${MYSQL_HOST} -e "GRANT ALL PRIVILEGES ON *.* TO ${MYSQL_USER}@'%'"
         mysql -uroot -p${MYSQL_ROOT_PASSWORD} -h${MYSQL_HOST} -e "ALTER USER ${MYSQL_USER}@'%' IDENTIFIED WITH mysql_native_password BY '${MYSQL_PASSWORD}'"
         mysql -uroot -p${MYSQL_ROOT_PASSWORD} -h${MYSQL_HOST} -e "FLUSH PRIVILEGES"
