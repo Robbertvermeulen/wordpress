@@ -196,7 +196,7 @@ Now we need to update our `wordpress` service to include its own custom domain n
     SITE_NAME=example
     ```
 
-1. Next, we need to remove the old Wordpress project and its respective mysql volume so that we can re-install a new Wordpress project using the new domain names. 
+1. Next, we need to remove the Wordpress project and its respective mysql volume so that we can re-install a new Wordpress project using the new domain names. 
     > You could manually change the settings inside the Wordpress dashboard but, for now, let's just create a new project. 
     ```
     rm -rf ./wordpress
@@ -379,7 +379,7 @@ services:
 ... 
 ```
 
-> This is useful to modify if you are using a Linux device to run this image and your UID is not 1000. Editing this argument will edit the UID and GID inside your container to match the UID of your local machine.
+> This is useful to modify if you are using a Linux device to run this image and your UID is not 1000. Editing this argument will edit the UID and GID for the user inside your container to match the UID of your local machine.
 
 
 You can then run `docker-compose up --build -d` to build and run your container with the new argument values. 
@@ -490,13 +490,13 @@ services:
       - traefik.http.routers.example-wordpress1.entrypoints=web
       - traefik.http.routers.example-wordpress1.rule=Host(
         `example.test`, `www.example.test`)
+      - traefik.http.services.example-wordpress1.loadbalancer.server.port=5000      
       - traefik.http.routers.example-wordpress1-secure.tls=true
       - traefik.http.routers.example-wordpress1-secure.entrypoints=web-secure
       - traefik.http.routers.example-wordpress1-secure.rule=Host(
         `example.test`, `www.example.test`)
       - traefik.http.routers.example-wordpress1.middlewares=https
       - traefik.http.middlewares.https.redirectscheme.scheme=https
-      - traefik.http.services.service1.loadbalancer.server.port=5000
     depends_on: 
       - mysql
     networks:
