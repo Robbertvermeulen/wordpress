@@ -17,9 +17,6 @@ services:
     restart: "no"
     environment:
       - MYSQL_ROOT_PASSWORD=password
-      - MYSQL_USER=user
-      - MYSQL_PASSWORD=password
-      - WORDPRESS_DB_HOST=mysql
       - WORDPRESS_DB_USER=user
       - WORDPRESS_DB_PASSWORD=password
       - WORDPRESS_DB_NAME=exampleDatabase
