@@ -1,19 +1,25 @@
 #!/bin/bash
 set -euo pipefail
 
+export WORDPRESS_DB_USER=${MYSQL_USER}
+export WORDPRESS_DB_PASSWORD=${MYSQL_PASSWORD}
+export WORDPRESS_DB_NAME=${MYSQL_DATABASE}
+export MYSQL_HOST=mysql
+export WORDPRESS_DB_HOST=${MYSQL_HOST}
+
 if [ ! "$(ls -A /var/www/html/)" ]; then
     mysql_connect_retry () {
-        while ! mysqladmin ping -u${WORDPRESS_DB_USER} -h${WORDPRESS_DB_HOST:-mysql} -p${WORDPRESS_DB_PASSWORD} --silent; do
+        while ! mysqladmin ping -u${MYSQL_USER} -h${MYSQL_HOST} -p${MYSQL_PASSWORD} --silent; do
             echo "- Awaiting response from MySQL..."
             sleep 10
         done
     }
 
     setup_mysql_database () {
-        mysql -uroot -p${MYSQL_ROOT_PASSWORD} -h${WORDPRESS_DB_HOST:-mysql} -e "CREATE DATABASE IF NOT EXISTS ${WORDPRESS_DB_NAME}"
-        mysql -uroot -p${MYSQL_ROOT_PASSWORD} -h${WORDPRESS_DB_HOST:-mysql} -e "GRANT ALL PRIVILEGES ON *.* TO ${WORDPRESS_DB_USER}@'%'"
-        mysql -uroot -p${MYSQL_ROOT_PASSWORD} -h${WORDPRESS_DB_HOST:-mysql} -e "ALTER USER ${WORDPRESS_DB_USER}@'%' IDENTIFIED WITH mysql_native_password BY '${WORDPRESS_DB_PASSWORD}'"
-        mysql -uroot -p${MYSQL_ROOT_PASSWORD} -h${WORDPRESS_DB_HOST:-mysql} -e "FLUSH PRIVILEGES"
+        mysql -uroot -p${MYSQL_ROOT_PASSWORD} -h${MYSQL_HOST} -e "CREATE DATABASE IF NOT EXISTS ${MYSQL_NAME}"
+        mysql -uroot -p${MYSQL_ROOT_PASSWORD} -h${MYSQL_HOST} -e "GRANT ALL PRIVILEGES ON *.* TO ${MYSQL_USER}@'%'"
+        mysql -uroot -p${MYSQL_ROOT_PASSWORD} -h${MYSQL_HOST} -e "ALTER USER ${MYSQL_USER}@'%' IDENTIFIED WITH mysql_native_password BY '${MYSQL_PASSWORD}'"
+        mysql -uroot -p${MYSQL_ROOT_PASSWORD} -h${MYSQL_HOST} -e "FLUSH PRIVILEGES"
     }
 
     mysql_connect_retry
