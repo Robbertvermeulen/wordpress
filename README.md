@@ -410,7 +410,6 @@ You can then run `docker-compose up --build -d` to build and run your container 
 `./traefik/docker-compose.yml`
 
 ```
-
 version: "3.7"
 services:
   traefik:
@@ -435,27 +434,22 @@ services:
 networks:
   traefik:
     external: true
-
 ```
 
 `./traefik/dynamic_conf.toml`
 
 ```
-
 [tls]
   [[tls.certificates]]
     certFile = "/certificates/example-cert.pem"
     keyFile = "/certificates/example-key.pem"
-    
 ```
 
 `./traefik/certificates/`
 
 ```
-
 ./example-cert.pem
 ./example-key.pem
-
 ```
 
 `./example/docker-compose.yml`
@@ -506,5 +500,4 @@ volumes:
 networks:
   traefik:
     external: true
-
 ```
