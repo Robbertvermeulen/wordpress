@@ -52,7 +52,7 @@ services:
       - MYSQL_ROOT_PASSWORD=password
       - MYSQL_USER=user
       - MYSQL_PASSWORD=password
-      - WORDPRESS_DB_NAME=exampleDatabase
+      - MYSQL_DATABASE=exampleDatabase
       - SITE_URL=https://example.test
       - SITE_NAME=example
     volumes:
@@ -127,7 +127,7 @@ Traefik describes itself is an open-source reverse proxy/load balancer. We can e
       - MYSQL_ROOT_PASSWORD=password
       - MYSQL_USER=user
       - MYSQL_PASSWORD=password
-      - WORDPRESS_DB_NAME=exampleDatabase
+      - MYSQL_DATABASE=exampleDatabase
       - SITE_URL=https://example.test
       - SITE_NAME=example
       volumes:
@@ -334,7 +334,7 @@ There may be a scenario where you would like to have multiple instances of the s
   * volume names do not match.
   * that you add a new "named volume" to the bottom of your compose file to match any new services created with MySQL.
   * you update the name of any services the container `depends_on` to match the new service name(s).
-  * the `$WORDPRESS_DB_HOST` environment variable is present and matches the new service name(s).
+  * the `$MYSQL_HOST` environment variable is present and matches the new service name(s).
 
 Furthermore, just like when creating a new project, you must ensure that the following values are also updated so that they are unique: 
 
@@ -398,7 +398,7 @@ You can then run `docker-compose up --build -d` to build and run your container 
 > Needed so that the Wordpress instance can create database entries.
 * `MYSQL_PASSWORD=password`
 > Needed so that the Wordpress instance can create database entries.
-* `WORDPRESS_DB_NAME=exampleDatabase`
+* `MYSQL_DATABASE=exampleDatabase`
 > Creates a database using this name. Grants all privileges to `$MYSQL_USER`.
 * `SITE_URL=https://example.test`
 > Sets the website name inside Wordpress and is also used as a basis to set the `ServerName` and `ServerAlias` for Apache's Virtual Hosts.
@@ -474,7 +474,7 @@ services:
       - MYSQL_ROOT_PASSWORD=password
       - MYSQL_USER=user
       - MYSQL_PASSWORD=password
-      - WORDPRESS_DB_NAME=exampleDatabase
+      - MYSQL_DATABASE=exampleDatabase
       - SITE_URL=https://example.test
       - SITE_NAME=example
     volumes:
