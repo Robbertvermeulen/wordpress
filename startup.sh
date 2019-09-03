@@ -10,10 +10,10 @@ if [ ! "$(ls -A /var/www/html/)" ]; then
     }
 
     setup_mysql_database () {
-        mysql -uroot -p${MYSQL_ROOT_PASSWORD} -h${WORDPRESS_DB_HOST:-mysql} -e "CREATE DATABASE IF NOT EXISTS ${WORDPRESS_DB_NAME}"
-        mysql -uroot -p${MYSQL_ROOT_PASSWORD} -h${WORDPRESS_DB_HOST:-mysql} -e "GRANT ALL PRIVILEGES ON *.* TO ${WORDPRESS_DB_USER}@'%'"
-        mysql -uroot -p${MYSQL_ROOT_PASSWORD} -h${WORDPRESS_DB_HOST:-mysql} -e "ALTER USER ${WORDPRESS_DB_USER}@'%' IDENTIFIED WITH mysql_native_password BY '${WORDPRESS_DB_PASSWORD}'"
-        mysql -uroot -p${MYSQL_ROOT_PASSWORD} -h${WORDPRESS_DB_HOST:-mysql} -e "FLUSH PRIVILEGES"
+        mysql -uroot -p${MYSQL_ROOT_PASSWORD:-} -h${WORDPRESS_DB_HOST:-mysql} -e "CREATE DATABASE IF NOT EXISTS ${WORDPRESS_DB_NAME}"
+        mysql -uroot -p${MYSQL_ROOT_PASSWORD:-} -h${WORDPRESS_DB_HOST:-mysql} -e "GRANT ALL PRIVILEGES ON *.* TO ${WORDPRESS_DB_USER}@'%'"
+        mysql -uroot -p${MYSQL_ROOT_PASSWORD:-} -h${WORDPRESS_DB_HOST:-mysql} -e "ALTER USER ${WORDPRESS_DB_USER}@'%' IDENTIFIED WITH mysql_native_password BY '${WORDPRESS_DB_PASSWORD}'"
+        mysql -uroot -p${MYSQL_ROOT_PASSWORD:-} -h${WORDPRESS_DB_HOST:-mysql} -e "FLUSH PRIVILEGES"
     }
 
     mysql_connect_retry
