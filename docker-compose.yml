@@ -17,24 +17,24 @@ services:
     restart: "no"
     environment:
       - MYSQL_ROOT_PASSWORD=password
-      - MYSQL_USER=user
-      - MYSQL_PASSWORD=password
-      - MYSQL_DATABASE=exampleDatabase
+      - WORDPRESS_DB_USER=root
+      - WORDPRESS_DB_PASSWORD=password
+      - WORDPRESS_DB_NAME=exampleDatabase
       - SITE_URL=https://example.test
-      - SITE_NAME=example
+      - SITE_NAME=example 
     volumes:
       - ./wordpress:/var/www/html
     labels:
       - traefik.http.routers.example-wordpress1.entrypoints=web
       - traefik.http.routers.example-wordpress1.rule=Host(
         `example.test`, `www.example.test`)
+      - traefik.http.services.example-wordpress1.loadbalancer.server.port=5000
       - traefik.http.routers.example-wordpress1-secure.tls=true
       - traefik.http.routers.example-wordpress1-secure.entrypoints=web-secure
       - traefik.http.routers.example-wordpress1-secure.rule=Host(
         `example.test`, `www.example.test`)
       - traefik.http.routers.example-wordpress1.middlewares=https
       - traefik.http.middlewares.https.redirectscheme.scheme=https
-      - traefik.http.services.service1.loadbalancer.server.port=5000
     depends_on: 
       - mysql
     networks:
