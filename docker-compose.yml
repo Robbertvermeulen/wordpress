@@ -6,9 +6,7 @@ services:
     volumes:
       - mysql:/var/lib/mysql
     environment:
-      - MYSQL_ROOT_PASSWORD=password
-      - MYSQL_USER=user
-      - MYSQL_PASSWORD=password
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
     command: --default-authentication-plugin=mysql_native_password
   wordpress:
     image: apache-wordpress 
@@ -16,12 +14,11 @@ services:
       context: .
     restart: "no"
     environment:
-      - MYSQL_ROOT_PASSWORD=password
-      - WORDPRESS_DB_USER=root
-      - WORDPRESS_DB_PASSWORD=password
-      - WORDPRESS_DB_NAME=exampleDatabase
-      - SITE_URL=https://example.test
-      - SITE_NAME=example 
+      WORDPRESS_DB_USER: root
+      WORDPRESS_DB_PASSWORD: ""
+      WORDPRESS_DB_NAME: exampleDatabase
+      SITE_URL: https://example.test
+      SITE_NAME: example 
     volumes:
       - ./wordpress:/var/www/html
     labels:
