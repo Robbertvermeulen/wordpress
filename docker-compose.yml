@@ -9,28 +9,28 @@ services:
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
     command: --default-authentication-plugin=mysql_native_password
   wordpress:
-    image: apache-wordpress 
+    image: wordpress
     build: 
       context: .
     restart: "no"
     environment:
       WORDPRESS_DB_USER: root
       WORDPRESS_DB_PASSWORD: ""
-      WORDPRESS_DB_NAME: exampleDatabase
-      SITE_URL: https://example.test
-      SITE_NAME: example 
+      WORDPRESS_DB_NAME: ${COMPOSE_PROJECT_NAME}
+      SITE_URL: https://${COMPOSE_PROJECT_NAME}.test
+      SITE_NAME: ${COMPOSE_PROJECT_NAME} 
     volumes:
       - ./wordpress:/var/www/html
     labels:
-      - traefik.http.routers.example-wordpress1.entrypoints=web
-      - traefik.http.routers.example-wordpress1.rule=Host(
-        `example.test`, `www.example.test`)
-      - traefik.http.services.example-wordpress1.loadbalancer.server.port=5000
-      - traefik.http.routers.example-wordpress1-secure.tls=true
-      - traefik.http.routers.example-wordpress1-secure.entrypoints=web-secure
-      - traefik.http.routers.example-wordpress1-secure.rule=Host(
-        `example.test`, `www.example.test`)
-      - traefik.http.routers.example-wordpress1.middlewares=https
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-wordpress1.entrypoints=web
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-wordpress1.rule=Host(
+        `${COMPOSE_PROJECT_NAME}.test`, `www.${COMPOSE_PROJECT_NAME}.test`)
+      - traefik.http.services.${COMPOSE_PROJECT_NAME}-wordpress1.loadbalancer.server.port=5000
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-wordpress1-secure.tls=true
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-wordpress1-secure.entrypoints=web-secure
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-wordpress1-secure.rule=Host(
+        `${COMPOSE_PROJECT_NAME}.test`, `www.${COMPOSE_PROJECT_NAME}.test`)
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-wordpress1.middlewares=https
       - traefik.http.middlewares.https.redirectscheme.scheme=https
     depends_on: 
       - mysql
