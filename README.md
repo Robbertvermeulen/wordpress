@@ -49,9 +49,9 @@ services:
     environment: 
       WORDPRESS_DB_USER: root
       WORDPRESS_DB_PASSWORD: ""
-      WORDPRESS_DB_NAME=${COMPOSE_PROJECT_NAME}
-      SITE_URL=http://${COMPOSE_PROJECT_NAME}
-      SITE_NAME=${COMPOSE_PROJECT_NAME}
+      WORDPRESS_DB_NAME: ${COMPOSE_PROJECT_NAME}
+      SITE_URL: http://${COMPOSE_PROJECT_NAME}
+      SITE_NAME: ${COMPOSE_PROJECT_NAME}
     volumes:
       - ./wordpress:/var/www/html/
     depends_on:
@@ -188,7 +188,7 @@ Now we need to update our `wordpress` service to include its own custom domain n
 1. Change the value of `SITE URL` to include `.test`: 
 
     ```
-    SITE_URL=http://${COMPOSE_PROJECT_NAME}.test
+    SITE_URL: http://${COMPOSE_PROJECT_NAME}.test
     ```
 
 1. Next, we need to remove the Wordpress project and its respective mysql volume so that we can re-install a new Wordpress project using the new domain names. 
@@ -381,19 +381,19 @@ You can then run `docker-compose build` to build your container with the new arg
 
 ### Environment Variables 
 
-* `MYSQL_ROOT_PASSWORD=password`
+* `MYSQL_ROOT_PASSWORD: password`
 > Only needed if you are using a root password with MySQL so that the Wordpress instance can create database entries.
-* `WORDPRESS_DB_HOST=mysql`
+* `WORDPRESS_DB_HOST: mysql`
 > *Optional*: The name of our mysql service acts as its hostname. Change this if you have named your service differently or you are running multiple mysql services. Defaults to `mysql`.    
-* `WORDPRESS_DB_USER=user`
+* `WORDPRESS_DB_USER: user`
 > Needed so that the Wordpress instance can create database entries.
-* `WORDPRESS_DB_PASSWORD=password`
+* `WORDPRESS_DB_PASSWORD: password`
 > Needed so that the Wordpress instance can create database entries. 
-* `WORDPRESS_DB_NAME=exampleDatabase`
+* `WORDPRESS_DB_NAME: exampleDatabase`
 > Creates a database using this name. Grants all privileges to `$MYSQL_USER` (if applicable).
-* `SITE_URL=https://example.test`
+* `SITE_URL: https://example.test`
 > Sets the website name inside Wordpress and is also used as a basis to set the `ServerName` and `ServerAlias` for Apache's Virtual Hosts.
-* `SITE_NAME=example`
+* `SITE_NAME: example`
 > Sets the project's name on Wordpress's dashboard.
 
 ## Example Project 
