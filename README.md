@@ -41,20 +41,17 @@ services:
     volumes:
       - mysql:/var/lib/mysql
     environment:
-      - MYSQL_ROOT_PASSWORD=password
-      - MYSQL_USER=user
-      - MYSQL_PASSWORD=password
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
     command: --default-authentication-plugin=mysql_native_password
   wordpress:
     image: jamesgreenaway/wordpress:latest
     restart: unless-stopped
     environment: 
-      - MYSQL_ROOT_PASSWORD=password
-      - WORDPRESS_DB_USER=user
-      - WORDPRESS_DB_PASSWORD=password
-      - WORDPRESS_DB_NAME=exampleDatabase
-      - SITE_URL=https://example.test
-      - SITE_NAME=example
+      WORDPRESS_DB_USER: root
+      WORDPRESS_DB_PASSWORD: ""
+      WORDPRESS_DB_NAME=${COMPOSE_PROJECT_NAME}
+      SITE_URL=http://${COMPOSE_PROJECT_NAME}
+      SITE_NAME=${COMPOSE_PROJECT_NAME}
     volumes:
       - ./wordpress:/var/www/html/
     depends_on:
@@ -68,7 +65,7 @@ volumes:
 ### How to:
 
 1. Create a `docker-compose.yml` file using the above configuration. 
-1. Run `docker-compose up -d`. 
+1. Run `COMPOSE_PROJECT_NAME=localhost docker-compose up -d`. 
 1. Run `docker-compose logs -f wordpress` to view the Wordpress installation process. 
 1. Once the installation is complete you can visit: `http://localhost:80` to see your new instance of Wordpress running. 
 1. Stop your container by running `docker-compose down`.
@@ -124,19 +121,18 @@ Traefik describes itself is an open-source reverse proxy/load balancer. We can e
       image: jamesgreenaway/wordpress:latest
       restart: unless-stopped
       environment: 
-      - MYSQL_ROOT_PASSWORD=password
-      - WORDPRESS_DB_USER=user
-      - WORDPRESS_DB_PASSWORD=password
-      - WORDPRESS_DB_NAME=exampleDatabase
-      - SITE_URL=https://example.test
-      - SITE_NAME=example
+        WORDPRESS_DB_USER: root
+        WORDPRESS_DB_PASSWORD: ""
+        WORDPRESS_DB_NAME: ${COMPOSE_PROJECT_NAME}
+        SITE_URL: http://${COMPOSE_PROJECT_NAME}
+        SITE_NAME: ${COMPOSE_PROJECT_NAME}
       volumes:
         - ./wordpress:/var/www/html/
       labels:
-        - traefik.http.routers.example-wordpress1.entrypoints=web
-        - traefik.http.routers.example-wordpress1.rule=Host(
-          `localhost`)
-        - traefik.http.services.example-wordpress1.loadbalancer.server.port=5000
+        - traefik.http.routers.${COMPOSE_PROJECT_NAME}-wordpress1.entrypoints=web
+        - traefik.http.routers.${COMPOSE_PROJECT_NAME}-wordpress1.rule=Host(
+          `${COMPOSE_PROJECT_NAME}`)
+        - traefik.http.services.${COMPOSE_PROJECT_NAME}-wordpress1.loadbalancer.server.port=5000
       depends_on:
         - mysql
         - traefik
@@ -145,7 +141,7 @@ Traefik describes itself is an open-source reverse proxy/load balancer. We can e
         - traefik
     ``` 
 
-1. Run `docker-compose up -d` to start our containers. 
+1. Run `COMPOSE_PROJECT_NAME=localhost docker-compose up -d` to start our containers. 
 1. Now you can visit `http://localhost:80` to see your instance of Wordpress running. The container is still running on `localhost:80`, however, Traefik is now intercepting all requests to this port and sending them to our container.
 
 >  Remember to stop all containers before continuing. 
@@ -183,17 +179,16 @@ Now we need to update our `wordpress` service to include its own custom domain n
 1. Edit the Host rule label inside the `docker-compose.yml` file so that it matches the following configuration:
 
     ```
-    - traefik.http.routers.example-wordpress1.rule=Host(
-      `example.test`, `www.example.test`)
+    - traefik.http.routers.${COMPOSE_PROJECT_NAME}-wordpress1.rule=Host(
+      `${COMPOSE_PROJECT_NAME}.test`, `www.${COMPOSE_PROJECT_NAME}.test`)
     ```
 
     > **Note**: `www.` was added to our Virtual Host as a ServerAlias at build time. We have, therefore, added it to our Host rule as a subdomain. If you would like to have different services running on other subdomains it is recommended that you add a separate service to your compose file (see the section called "Adding Wordpress to a subdomain" below for more information on how to achieve this).
 
-1. Change the value of the following environment variables: 
+1. Change the value of `SITE URL` to include `.test`: 
 
     ```
-    SITE_URL=http://example.test
-    SITE_NAME=example
+    SITE_URL=http://${COMPOSE_PROJECT_NAME}.test
     ```
 
 1. Next, we need to remove the Wordpress project and its respective mysql volume so that we can re-install a new Wordpress project using the new domain names. 
@@ -203,7 +198,7 @@ Now we need to update our `wordpress` service to include its own custom domain n
     docker volume rm <project_directory_name>_mysql
     ```
 
-1. Run `docker-compose up -d` to start our container. 
+1. Run `COMPOSE_PROJECT_NAME=example docker-compose up -d` to start our container. 
 1. Once installed you can visit `http://example.test` to see your instance of Wordpress running.
 >  Remember to stop all containers before continuing.
 
@@ -222,7 +217,7 @@ Please consult the [mkcert](https://github.com/FiloSottile/mkcert) Github reposi
 To create a certificate, create a folder called `certificates/` and run the following command:
 
 ```
-mkcert -cert-file certificates/example-cert.pem -key-file certificates/example-key.pem "example.test" "*.example.test"
+COMPOSE_PROJECT_NAME=example mkcert -cert-file certificates/${COMPOSE_PROJECT_NAME}-cert.pem -key-file certificates/${COMPOSE_PROJECT_NAME}-key.pem "${COMPOSE_PROJECT_NAME}.test" "*.${COMPOSE_PROJECT_NAME}.test"
 ```
 
 Once you have created your certificates you will need to inform Traefik of where it can locate them. Please add a file called `dynamic_conf.toml` and include the following text for each project you create certificates for:
@@ -234,7 +229,7 @@ Once you have created your certificates you will need to inform Traefik of where
     keyFile = "/certificates/example-key.pem"
 ```
 
-**Important**: Make sure that, for every project, you edit the word `example` to match the environment variable `$SITE_NAME`. 
+**Important**: Make sure that, for every project, you edit the word `example` to match the value given to the `COMPOSE_PROJECT_NAME` environment variable. You *must* hard code the value for `COMPOSE_PROJECT_NAME`.
 
 > Hopefully this step will not be necessary in the future when Traefik v2.0 is complete. [3#card-24640764](https://github.com/containous/traefik/projects/3#card-24640764)
 
@@ -262,17 +257,15 @@ Now we need to update our containers to include this feature. Let's start by edi
 1. Now, we need to edit our `wordpress` service.  Add the following flags to the `labels` configuration option: 
 
     ```
-    - traefik.http.routers.example-wordpress1-secure.tls=true
-    - traefik.http.routers.example-wordpress1-secure.entrypoints=web-secure
-    - traefik.http.routers.example-wordpress1-secure.rule=Host(
-      `example.test`, `www.example.test`)
+    - traefik.http.routers.${COMPOSE_PROJECT_NAME}-wordpress1-secure.tls=true
+    - traefik.http.routers.${COMPOSE_PROJECT_NAME}-wordpress1-secure.entrypoints=web-secure
+    - traefik.http.routers.${COMPOSE_PROJECT_NAME}-wordpress1-secure.rule=Host(
+      `${COMPOSE_PROJECT_NAME}.test`, `www.${COMPOSE_PROJECT_NAME}.test`)
     ```
 
-1. Finally, update the `$SITE_URL` environment variable to `https://`:
+1. Finally, update the `$SITE_URL` environment variable to `https://`
 
-    `SITE_URL=https://example.test`
-
-1. Run `docker-compose up -d` to run.
+1. Run `COMPOSE_PROJECT_NAME=example docker-compose up -d` to run.
 
 1. You can now visit `https://example.test` to see your instance of Wordpress running using the HTTPS protocol.
 
@@ -314,11 +307,9 @@ The last step is to create a new certificate for your project. Follow the steps 
 If you would like your site to always redirect to HTTPS you can add the following middleware to the `wordpress` services labels: 
 
 ```
-- traefik.http.routers.example-wordpress1.middlewares=https
+- traefik.http.routers.${COMPOSE_PROJECT_NAME}-wordpress1.middlewares=https
 - traefik.http.middlewares.https.redirectscheme.scheme=https
 ```
-
-> Please remember to update the name of the router (in this case it's `example-wordpress1`) when starting a new project. 
 
 Now our domain will always redirect back to the HTTPS protocol.
 
@@ -350,16 +341,16 @@ Furthermore, just like when creating a new project, you must ensure that the fol
 
 ### Exporting and importing databases.
 
-* `docker exec <container-name> sh -c 'exec mysqldump <database> -uroot -p"$MYSQL_ROOT_PASSWORD"' > mysqldump.sql`
+* `docker exec <container-name> sh -c 'exec mysqldump <database> -uroot' > mysqldump.sql`
 > This will take an existing database and dump the contents of the database in a file named mysqldump.sql
 
-* `docker exec -i <container-name> sh -c 'exec mysql <database> -uroot -p"$MYSQL_ROOT_PASSWORD"' < mysqldump.sql`
+* `docker exec -i <container-name> sh -c 'exec mysql <database> -uroot' < mysqldump.sql`
 > This will take an existing mysqldump.sql and dump its contents in to a database of your choosing.
 
-* `docker exec <container-name> sh -c 'exec mysqldump <database> -uroot -p"$MYSQL_ROOT_PASSWORD"' | ssh <remote_server> mysql -uroot <database>`
+* `docker exec <container-name> sh -c 'exec mysqldump <database> -uroot' | ssh <remote_server> mysql -uroot <database>`
 > This will take an existing database and dump the contents of the database in to a named database on a remote server
 
-* `ssh <remote_server> mysqldump <database> | docker exec -i <container-name> sh -c 'exec mysql <database> -uroot -p"$MYSQL_ROOT_PASSWORD"'`
+* `ssh <remote_server> mysqldump <database> | docker exec -i <container-name> sh -c 'exec mysql <database> -uroot'`
 > This will take a existing database on a remote server and dump the contents inside named local database. 
 
 ---
@@ -382,7 +373,7 @@ services:
 > This is useful to modify if you are using a Linux device to run this image and your UID is not 1000. Editing this argument will edit the UID and GID for the user inside your container to match the UID of your local machine.
 
 
-You can then run `docker-compose up --build -d` to build and run your container with the new argument values. 
+You can then run `docker-compose build` to build your container with the new argument values. 
 
 --- 
 
@@ -391,15 +382,15 @@ You can then run `docker-compose up --build -d` to build and run your container 
 ### Environment Variables 
 
 * `MYSQL_ROOT_PASSWORD=password`
-> Needed so that the Wordpress instance can create database entries.
+> Only needed if you are using a root password with MySQL so that the Wordpress instance can create database entries.
 * `WORDPRESS_DB_HOST=mysql`
 > *Optional*: The name of our mysql service acts as its hostname. Change this if you have named your service differently or you are running multiple mysql services. Defaults to `mysql`.    
 * `WORDPRESS_DB_USER=user`
 > Needed so that the Wordpress instance can create database entries.
 * `WORDPRESS_DB_PASSWORD=password`
-> Needed so that the Wordpress instance can create database entries.
+> Needed so that the Wordpress instance can create database entries. 
 * `WORDPRESS_DB_NAME=exampleDatabase`
-> Creates a database using this name. Grants all privileges to `$MYSQL_USER`.
+> Creates a database using this name. Grants all privileges to `$MYSQL_USER` (if applicable).
 * `SITE_URL=https://example.test`
 > Sets the website name inside Wordpress and is also used as a basis to set the `ServerName` and `ServerAlias` for Apache's Virtual Hosts.
 * `SITE_NAME=example`
@@ -414,7 +405,7 @@ version: "3.7"
 services:
   traefik:
     restart: always
-    image: traefik:v2.0.0-rc1
+    image: traefik:v2.0.0-rc2
     ports:
       - 80:5000
       - 443:443
@@ -463,32 +454,29 @@ services:
     volumes:
       - mysql:/var/lib/mysql
     environment:
-      - MYSQL_ROOT_PASSWORD=password
-      - MYSQL_USER=user
-      - MYSQL_PASSWORD=password
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
     command: --default-authentication-plugin=mysql_native_password
   wordpress:
     image: jamesgreenaway/wordpress:latest 
     restart: unless-stopped
     environment:
-      - MYSQL_ROOT_PASSWORD=password
-      - WORDPRESS_DB_USER=user
-      - WORDPRESS_DB_PASSWORD=password
-      - WORDPRESS_DB_NAME=exampleDatabase
-      - SITE_URL=https://example.test
-      - SITE_NAME=example
+      WORDPRESS_DB_USER: root
+      WORDPRESS_DB_PASSWORD: ""
+      WORDPRESS_DB_NAME: ${COMPOSE_PROJECT_NAME}
+      SITE_URL: https://${COMPOSE_PROJECT_NAME}.test
+      SITE_NAME: ${COMPOSE_PROJECT_NAME}
     volumes:
       - ./wordpress:/var/www/html
     labels:
-      - traefik.http.routers.example-wordpress1.entrypoints=web
-      - traefik.http.routers.example-wordpress1.rule=Host(
-        `example.test`, `www.example.test`)
-      - traefik.http.services.example-wordpress1.loadbalancer.server.port=5000      
-      - traefik.http.routers.example-wordpress1-secure.tls=true
-      - traefik.http.routers.example-wordpress1-secure.entrypoints=web-secure
-      - traefik.http.routers.example-wordpress1-secure.rule=Host(
-        `example.test`, `www.example.test`)
-      - traefik.http.routers.example-wordpress1.middlewares=https
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-wordpress1.entrypoints=web
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-wordpress1.rule=Host(
+        `${COMPOSE_PROJECT_NAME}.test`, `www.${COMPOSE_PROJECT_NAME}.test`)
+      - traefik.http.services.${COMPOSE_PROJECT_NAME}-wordpress1.loadbalancer.server.port=5000
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-wordpress1-secure.tls=true
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-wordpress1-secure.entrypoints=web-secure
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-wordpress1-secure.rule=Host(
+        `${COMPOSE_PROJECT_NAME}.test`, `www.${COMPOSE_PROJECT_NAME}.test`)
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-wordpress1.middlewares=https
       - traefik.http.middlewares.https.redirectscheme.scheme=https
     depends_on: 
       - mysql
