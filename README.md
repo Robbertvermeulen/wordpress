@@ -261,6 +261,7 @@ Now we need to update our containers to include this feature. Let's start by edi
     --providers.file.filename=/config/dynamic_conf.toml
     --providers.file.watch=true
     ```
+    > **Important**: You **must** run `docker-compose restart traefik` to update Traefik with new certificates. 
 
 1. Now, we need to edit our `wordpress` service.  Add the following flags to the `labels` configuration option: 
 
