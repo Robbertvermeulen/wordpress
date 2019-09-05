@@ -65,17 +65,17 @@ volumes:
 ### How to:
 
 1. Create a `docker-compose.yml` file using the above configuration. 
-1. Enter `export COMPOSE_PROJECT_NAME=localhost` in to the command line and press enter.
+1. Type `COMPOSE_PROJECT_NAME=localhost` inside a file called `.env`.
 1. Run `docker-compose up -d`. 
 1. Run `docker-compose logs -f wordpress` to view the Wordpress installation process. 
 1. Once the installation is complete you can visit: `http://localhost:80` to see your new instance of Wordpress running. 
-1. Stop your container by running `docker-compose down --volumes`.
+1. Stop your container by running `docker-compose down`.
 
-**Important** None of the variables for our `mysql` service will have any effect if you start the container with a data directory that already contains a database: any pre-existing database will always be left untouched on container startup. Therefore, if you make a mistake, please make sure that you remove the `mysql` volume first before restarting your container: 
+**Important**: None of the variables for our `mysql` service will have any effect if you start the container with a data directory that already contains a database: any pre-existing database will always be left untouched on container startup. Therefore, if you make a mistake, please make sure that you remove the `mysql` volume first before restarting your container: 
 
 `docker volume rm <project_directory_name>_mysql`
 
-**Important** We are using `COMPOSE_PROJECT_NAME` as a variable inside our `docker-compose.yml` file to prevent us from needing to update the name of the project for every option. For this example we have simple created a temporary variable inside our shell, however, it is also possible to add the value to a `.env` file. 
+**Important**: We are using `COMPOSE_PROJECT_NAME` as a variable inside our `docker-compose.yml` file to prevent us from needing to update the name of the project for every option. For this example we have simply created a file called `.env`, however, there are a number of ways to include this variable. Please see "[Environment variables in Compose](https://docs.docker.com/compose/environment-variables/)" for more information.
 
 ---
 
@@ -91,7 +91,7 @@ Traefik describes itself is an open-source reverse proxy/load balancer. We can e
 ...
   traefik:
     restart: always
-    image: traefik:v2.0.0-rc1
+    image: traefik:v2.0.0-rc2
     ports:
       - 80:5000
     volumes:
@@ -201,9 +201,9 @@ Now we need to update our `wordpress` service to include its own custom domain n
     docker volume rm <project_directory_name>_mysql
     ```
 
-1. Update the `COMPOSE_PROJECT_NAME` environment variable we added to our shell earlier by running: 
+1. Update the `COMPOSE_PROJECT_NAME` environment variable inside our `.env` file: 
 
-  `export COMPOSE_PROJECT_NAME=example`
+    `COMPOSE_PROJECT_NAME=example`
   
 1. Run `docker-compose up -d` to start our container. 
 1. Once installed you can visit `http://example.test` to see your instance of Wordpress running.
@@ -224,8 +224,9 @@ Please consult the [mkcert](https://github.com/FiloSottile/mkcert) Github reposi
 To create a certificate, create a folder called `certificates/` and run the following command:
 
 ```
-COMPOSE_PROJECT_NAME=example mkcert -cert-file certificates/${COMPOSE_PROJECT_NAME}-cert.pem -key-file certificates/${COMPOSE_PROJECT_NAME}-key.pem "${COMPOSE_PROJECT_NAME}.test" "*.${COMPOSE_PROJECT_NAME}.test"
+echo "example" > /dev/null && mkcert -cert-file certificates/$_-cert.pem -key-file certificates/$_-key.pem "$_.test" "*.$_.test"
 ```
+> For any future projects please replace `example` with the same value as `COMPOSE_PROJECT_NAME`.
 
 Once you have created your certificates you will need to inform Traefik of where it can locate them. Please add a file called `dynamic_conf.toml` and include the following text for each project you create certificates for:
 
@@ -270,7 +271,7 @@ Now we need to update our containers to include this feature. Let's start by edi
       `${COMPOSE_PROJECT_NAME}.test`, `www.${COMPOSE_PROJECT_NAME}.test`)
     ```
 
-1. Finally, update the `$SITE_URL` environment variable to `https://`
+1. Finally, update the `$SITE_URL` environment variable from `http://` to `https://`
 
 1. Run `docker-compose up -d` to run.
 
@@ -351,20 +352,20 @@ Furthermore, just like when creating a new project, you must ensure that the fol
 * `docker exec <container-name> sh -c 'exec mysqldump <database> -uroot' > mysqldump.sql`
 > This will take an existing database and dump the contents of the database in a file named mysqldump.sql
 
-* `docker exec -i <container-name> sh -c 'exec mysql <database> -uroot' < mysqldump.sql`
+* `docker exec <container-name> sh -c 'exec mysql <database> -uroot' < mysqldump.sql`
 > This will take an existing mysqldump.sql and dump its contents in to a database of your choosing.
 
 * `docker exec <container-name> sh -c 'exec mysqldump <database> -uroot' | ssh <remote_server> mysql -uroot <database>`
 > This will take an existing database and dump the contents of the database in to a named database on a remote server
 
-* `ssh <remote_server> mysqldump <database> | docker exec -i <container-name> sh -c 'exec mysql <database> -uroot'`
+* `ssh <remote_server> mysqldump <database> | docker exec <container-name> sh -c 'exec mysql <database> -uroot'`
 > This will take a existing database on a remote server and dump the contents inside named local database. 
 
 ---
 
 ### Building the image with alternative arguments.
 
-It is also possible to build this image with a different UID. This can alter some of the lower level settings that are already predetermined when using the default image. You need to reference the Github repository as a context and add the arguments to the `docker-compose.yml` file. For example: 
+It is also possible to build this image with a different UID and GID. You'll need to reference the Github repository as a context and add the arguments to the `docker-compose.yml` file. For example: 
 
 ```
 services:
@@ -379,8 +380,7 @@ services:
 
 > This is useful to modify if you are using a Linux device to run this image and your UID is not 1000. Editing this argument will edit the UID and GID for the user inside your container to match the UID of your local machine.
 
-
-You can then run `docker-compose build` to build your container with the new argument values. 
+You can then run `docker-compose up -d --build` to build your container with the new argument values. 
 
 --- 
 
