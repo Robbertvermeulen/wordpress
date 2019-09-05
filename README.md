@@ -75,7 +75,7 @@ volumes:
 
 `docker volume rm <project_directory_name>_mysql`
 
-**Important**: We are using `COMPOSE_PROJECT_NAME` as a variable inside our `docker-compose.yml` file to prevent us from needing to update the name of the project for every option. For this example we have simply created a file called `.env`, however, there are a number of ways to include this variable. Please see "[Environment variables in Compose](https://docs.docker.com/compose/environment-variables/)" for more information.
+**Important**: We are using `COMPOSE_PROJECT_NAME` as a variable inside our `docker-compose.yml` file to prevent us from needing to update the name of the project for every option. For this example, we have simply created a file called `.env`, however, there are several ways to include this variable. Please see "[Environment variables in Compose](https://docs.docker.com/compose/environment-variables/)" for more information.
 
 ---
 
@@ -296,7 +296,7 @@ The following options inside our `wordpress` service **must** be updated to matc
   * Router/service name(s)
   * Host rule domain name(s)
 
-**Note**: For the sake of this tutorial, Traefik has been included inside the first `docker-compose.yml` file. It is recommended that the user separate `traefik` and all its ancillary files to their own directory. Please see the bottom of this README for an example of how to lay out your project.
+**Note**: For the sake of this tutorial, Traefik has been included inside the first `docker-compose.yml` file. It is recommended that the user separate `traefik` and all its ancillary files to their own directory. Please see the bottom of this README for an example of how to layout your project.
 
 The last step is to create a new certificate for your project. Follow the steps in the "Let's add HTTPS" section and make sure that you update: 
 
