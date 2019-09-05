@@ -9,7 +9,7 @@ services:
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
     command: --default-authentication-plugin=mysql_native_password
   wordpress:
-    image: wordpress
+    image: jamesgreenaway/wordpress
     build: 
       context: .
     restart: "no"
