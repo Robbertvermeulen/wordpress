@@ -65,14 +65,17 @@ volumes:
 ### How to:
 
 1. Create a `docker-compose.yml` file using the above configuration. 
-1. Run `COMPOSE_PROJECT_NAME=localhost docker-compose up -d`. 
+1. Enter `export COMPOSE_PROJECT_NAME=localhost` in to the command line and press enter.
+1. Run `docker-compose up -d`. 
 1. Run `docker-compose logs -f wordpress` to view the Wordpress installation process. 
 1. Once the installation is complete you can visit: `http://localhost:80` to see your new instance of Wordpress running. 
-1. Stop your container by running `docker-compose down`.
+1. Stop your container by running `docker-compose down --volumes`.
 
 **Important** None of the variables for our `mysql` service will have any effect if you start the container with a data directory that already contains a database: any pre-existing database will always be left untouched on container startup. Therefore, if you make a mistake, please make sure that you remove the `mysql` volume first before restarting your container: 
 
 `docker volume rm <project_directory_name>_mysql`
+
+**Important** We are using `COMPOSE_PROJECT_NAME` as a variable inside our `docker-compose.yml` file to prevent us from needing to update the name of the project for every option. For this example we have simple created a temporary variable inside our shell, however, it is also possible to add the value to a `.env` file. 
 
 ---
 
@@ -141,7 +144,7 @@ Traefik describes itself is an open-source reverse proxy/load balancer. We can e
         - traefik
     ``` 
 
-1. Run `COMPOSE_PROJECT_NAME=localhost docker-compose up -d` to start our containers. 
+1. Run `docker-compose up -d` to start our containers. 
 1. Now you can visit `http://localhost:80` to see your instance of Wordpress running. The container is still running on `localhost:80`, however, Traefik is now intercepting all requests to this port and sending them to our container.
 
 >  Remember to stop all containers before continuing. 
@@ -198,7 +201,11 @@ Now we need to update our `wordpress` service to include its own custom domain n
     docker volume rm <project_directory_name>_mysql
     ```
 
-1. Run `COMPOSE_PROJECT_NAME=example docker-compose up -d` to start our container. 
+1. Update the `COMPOSE_PROJECT_NAME` environment variable we added to our shell earlier by running: 
+
+  `export COMPOSE_PROJECT_NAME=example`
+  
+1. Run `docker-compose up -d` to start our container. 
 1. Once installed you can visit `http://example.test` to see your instance of Wordpress running.
 >  Remember to stop all containers before continuing.
 
@@ -265,7 +272,7 @@ Now we need to update our containers to include this feature. Let's start by edi
 
 1. Finally, update the `$SITE_URL` environment variable to `https://`
 
-1. Run `COMPOSE_PROJECT_NAME=example docker-compose up -d` to run.
+1. Run `docker-compose up -d` to run.
 
 1. You can now visit `https://example.test` to see your instance of Wordpress running using the HTTPS protocol.
 
