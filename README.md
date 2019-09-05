@@ -22,7 +22,7 @@ This image is primarily based on "Docker Official Images", a regularly maintaine
 - [PHP v7.3](https://hub.docker.com/_/php)
 - [Wordpress v5.2.2](https://hub.docker.com/_/wordpress)
 - [MySQL v8.0](https://hub.docker.com/_/mysql)
-- [Traefik v2.0-rc1](https://hub.docker.com/_/traefik)
+- [Traefik v2.0-rc2](https://hub.docker.com/_/traefik)
 
 It will install Wordpress inside a volume whereby the user has access to all its files locally and in their entirety. Wordpress will link up to MySQL and all database entries will persist locally on the host machine ensuring that no data is lost when containers are stopped. 
 
