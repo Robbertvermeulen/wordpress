@@ -25,9 +25,15 @@ sudo sh -c "chown wordpress:wordpress /var/www/html"
 # Remove https from SITE_URL.
 export SERVER_NAME=`echo ${SITE_URL} |  awk -F"/" '{print $3}'`
 sudo sh -c "echo 'ServerName ${SERVER_NAME}' >> /etc/apache2/apache2.conf"
-# Update Virtual Hosts with server name/alias.
-sudo sed -ri "s!ServerName!ServerName ${SERVER_NAME}!" /etc/apache2/sites-available/000-default.conf
-sudo sed -ri "s!Listen 80!Listen 5000!" /etc/apache2/ports.conf
+# Update Virtual Hosts
+if [ -f /tmp/*.conf ]; then
+    chown root:root /tmp/*.conf 
+    sudo cp /tmp/*.conf /etc/apache2/sites-available/
+    sudo a2ensite *
+else
+    sudo sed -ri "s!ServerName!ServerName ${SERVER_NAME}!" /etc/apache2/sites-available/000-default.conf
+    sudo sed -ri "s!Listen 80!Listen 5000!" /etc/apache2/ports.conf
+fi
 
 # mute CMD from official wordpress image
 sudo sed -i -e 's/^exec "$@"/#exec "$@"/g' /usr/local/bin/docker-entrypoint.sh
