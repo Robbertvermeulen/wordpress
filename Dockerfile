@@ -4,9 +4,10 @@ RUN apt-get update && apt-get -y upgrade
 RUN apt-get install -y \ 
     sudo mariadb-client iputils-ping 
 
-# ENABLE APACHE REWRITES
+# CONFIGURE APACHE 
 # RUN a2enmod ssl && a2enmod rewrite
 RUN a2enmod rewrite
+RUN rm /etc/apache2/sites-available/default-ssl.conf
 
 # OVERRIDE VIRTUALHOSTS
 ENV APACHE_DOCUMENT_ROOT /var/www/html
