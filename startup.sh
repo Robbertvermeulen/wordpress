@@ -28,7 +28,7 @@ sudo sh -c "echo 'ServerName ${SERVER_NAME}' >> /etc/apache2/apache2.conf"
 # Update Virtual Hosts
 if [ -f /tmp/*.conf ]; then
     sudo cp /tmp/*.conf /etc/apache2/sites-available/
-    chown root:root /etc/apache2/sites-available/*.conf 
+    sudo chown root:root /etc/apache2/sites-available/*.conf 
     sudo a2ensite *
 else
     sudo sed -ri "s!ServerName!ServerName ${SERVER_NAME}!" /etc/apache2/sites-available/000-default.conf
