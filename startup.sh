@@ -23,11 +23,10 @@ fi
 sudo sh -c "chown wordpress:wordpress /var/www/html"
 
 # Remove https from SITE_URL.
-export SERVER_NAME=`echo ${SITE_URL} |  awk -F"/" '{print $3}'` 
+export SERVER_NAME=`echo ${SITE_URL} |  awk -F"/" '{print $3}'`
 sudo sh -c "echo 'ServerName ${SERVER_NAME}' >> /etc/apache2/apache2.conf"
 # Update Virtual Hosts with server name/alias.
 sudo sed -ri "s!ServerName!ServerName ${SERVER_NAME}!" /etc/apache2/sites-available/000-default.conf
-sudo sed -ri "s!ServerAlias!ServerAlias www.${SERVER_NAME}!" /etc/apache2/sites-available/000-default.conf
 sudo sed -ri "s!Listen 80!Listen 5000!" /etc/apache2/ports.conf
 
 # mute CMD from official wordpress image
