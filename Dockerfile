@@ -5,7 +5,6 @@ RUN apt-get install -y \
     sudo mariadb-client iputils-ping 
 
 # CONFIGURE APACHE 
-# RUN a2enmod ssl && a2enmod rewrite
 RUN a2enmod rewrite
 RUN rm /etc/apache2/sites-available/default-ssl.conf
 
