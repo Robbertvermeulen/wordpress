@@ -6,7 +6,6 @@ RUN apt-get install -y \
 
 # CONFIGURE APACHE 
 RUN a2enmod rewrite
-RUN rm /etc/apache2/sites-available/default-ssl.conf
 
 # OVERRIDE VIRTUALHOSTS
 ENV APACHE_DOCUMENT_ROOT /var/www/html
