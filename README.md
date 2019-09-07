@@ -64,7 +64,7 @@ volumes:
 ### How to:
 
 1. Create a `docker-compose.yml` file using the above configuration. 
-1. Type `COMPOSE_PROJECT_NAME=localhost` inside a file called `.env`.
+1. Run `echo "COMPOSE_PROJECT_NAME=localhost" > .env`.
 1. Run `docker-compose up -d`. 
 1. Run `docker-compose logs -f wordpress` to view the Wordpress installation process. 
 1. Once the installation is complete you can visit: `http://localhost:80` to see your new instance of Wordpress running. 
