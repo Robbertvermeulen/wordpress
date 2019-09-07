@@ -384,7 +384,7 @@ You can then run `docker-compose up -d --build` to build your container with the
 * `WORDPRESS_DB_HOST: mysql`
 > *Optional*: The name of our mysql service acts as its hostname. Change this if you have named your service differently or you are running multiple mysql services. Defaults to `mysql`.    
 * `WORDPRESS_DB_USER: root`
-> *Mandatory*: Needed so that the Wordpress instance can create database entries. Must be `root`. 
+> *Mandatory*: Needed so that the Wordpress instance can create database entries. 
 * `WORDPRESS_DB_PASSWORD: password`
 > *Mandatory*: Needed so that the Wordpress instance can create database entries. Must match `MYSQL_ROOT_PASSWORD` (if used). If `MYSQL_ALLOW_EMPTY_PASSWORD` is used please input: `WORDPRESS_DB_PASSWORD: ""`
 * `WORDPRESS_DB_NAME: exampleDatabase`
