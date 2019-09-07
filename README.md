@@ -51,7 +51,6 @@ services:
       WORDPRESS_DB_PASSWORD: ""
       WORDPRESS_DB_NAME: ${COMPOSE_PROJECT_NAME}
       SITE_URL: http://${COMPOSE_PROJECT_NAME}
-      SITE_NAME: ${COMPOSE_PROJECT_NAME}
     volumes:
       - ./wordpress:/var/www/html/
     depends_on:
@@ -70,10 +69,6 @@ volumes:
 1. Run `docker-compose logs -f wordpress` to view the Wordpress installation process. 
 1. Once the installation is complete you can visit: `http://localhost:80` to see your new instance of Wordpress running. 
 1. Stop your container by running `docker-compose down`.
-
-**Important**: None of the variables for our `mysql` service will have any effect if you start the container with a data directory that already contains a database: any pre-existing database will always be left untouched on container startup. Therefore, if you make a mistake, please make sure that you remove the `mysql` volume first before restarting your container: 
-
-`docker volume rm <project_directory_name>_mysql`
 
 **Important**: We are using `COMPOSE_PROJECT_NAME` as a variable inside our `docker-compose.yml` file to prevent us from needing to update the name of the project for every option. For this example, we have simply created a file called `.env`, however, there are several ways to include this variable. Please see "[Environment variables in Compose](https://docs.docker.com/compose/environment-variables/)" for more information.
 
@@ -128,7 +123,6 @@ Traefik describes itself is an open-source reverse proxy/load balancer. We can e
         WORDPRESS_DB_PASSWORD: ""
         WORDPRESS_DB_NAME: ${COMPOSE_PROJECT_NAME}
         SITE_URL: http://${COMPOSE_PROJECT_NAME}
-        SITE_NAME: ${COMPOSE_PROJECT_NAME}
       volumes:
         - ./wordpress:/var/www/html/
       labels:
@@ -287,22 +281,13 @@ Now we need to update our containers to include this feature. Let's start by edi
 So now the stage is set to run multiple Wordpress sites alongside each other. To create a new project all we need to do is copy the example `docker-compose.yml` file inside a new directory and update it with the details of our new site. 
 
 ### How to: 
-The following options inside our `wordpress` service **must** be updated to match the name of our new project: 
-
-- Environment variables: 
-  * `$SITE_URL`
-  * `$SITE_NAME`
-
-- Labels: 
-  * Router/service name(s)
-  * Host rule domain name(s)
+Change the value for `COMPOSE_PROJECT_NAME` inside our `.env` file to the name of our new project.
 
 **Note**: For the sake of this tutorial, Traefik has been included inside the first `docker-compose.yml` file. It is recommended that the user separate `traefik` and all its ancillary files to their own directory. Please see the bottom of this README for an example of how to layout your project.
 
 The last step is to create a new certificate for your project. Follow the steps in the "Let's add HTTPS" section and make sure that you update: 
 
-- the mkcert command with the new domain names.
-- the mkcert command with the new certificate names.
+- the mkcert command with the new project name.
 - the `dynamic_conf.toml` with the location of our new certificates.
 
 **Important**: You **must** run `docker-compose restart traefik` to update Traefik with new certificates. 
@@ -340,35 +325,10 @@ Furthermore, just like when creating a new project, you must ensure that the fol
 
 - Environment variables: 
   * `$SITE_URL`
-  * `$SITE_NAME`
 
 - Labels: 
   * Router/service name(s)
   * Host rule domain name(s)
-  
----
-
-### Adding custom Virtual Host file.
-
-The current Virtual Host file that is copied in to the image at run time looks like this: 
-
-```
-<VirtualHost *:5000>
-DocumentRoot /var/www/html
-ErrorLog ${APACHE_LOG_DIR}/errors.log
-CustomLog ${APACHE_LOG_DIR}/access.log combined
-ServerName
-<Directory /var/www/html>
-    Options Indexes FollowSymLinks
-    AllowOverride All
-    Require all granted
-</Directory>
-</VirtualHost>
-```
-
-If you need to add a custom Virtual Host file you must mount the file as a volume to the `/tmp` directory with a `.conf` suffix. For example:
-
-`- ./vhost.conf:/tmp/vhost.conf`
 
 ---
 
@@ -413,20 +373,24 @@ You can then run `docker-compose up -d --build` to build your container with the
 
 ### Environment Variables 
 
+#### For mysql service:
+* `MYSQL_ALLOW_EMPTY_PASSWORD: "yes"`
+> Run MySQL without the need for a password.
 * `MYSQL_ROOT_PASSWORD: password`
-> Only needed if you are using a root password with MySQL so that the Wordpress instance can create database entries.
+> Run MySQL with a password.
+*Important*: You must choose either one or the other.
+
+#### For wordpress service:
 * `WORDPRESS_DB_HOST: mysql`
 > *Optional*: The name of our mysql service acts as its hostname. Change this if you have named your service differently or you are running multiple mysql services. Defaults to `mysql`.    
-* `WORDPRESS_DB_USER: user`
-> Needed so that the Wordpress instance can create database entries.
+* `WORDPRESS_DB_USER: root`
+> *Mandatory*: Needed so that the Wordpress instance can create database entries. Must be `root`. 
 * `WORDPRESS_DB_PASSWORD: password`
-> Needed so that the Wordpress instance can create database entries. 
+> *Mandatory*: Needed so that the Wordpress instance can create database entries. Must match `MYSQL_ROOT_PASSWORD` (if used). If `MYSQL_ALLOW_EMPTY_PASSWORD` is used please input: `WORDPRESS_DB_PASSWORD: ""`
 * `WORDPRESS_DB_NAME: exampleDatabase`
-> Creates a database using this name. Grants all privileges to `$MYSQL_USER` (if applicable).
+> *Mandatory*: Creates a database using this name.
 * `SITE_URL: https://example.test`
-> Sets the website name inside Wordpress and is also used as a basis to set the `ServerName` and `ServerAlias` for Apache's Virtual Hosts.
-* `SITE_NAME: example`
-> Sets the project's name on Wordpress's dashboard.
+> *Mandatory*: Sets the website name inside Wordpress and is also used as a basis to set the `ServerName` and `ServerAlias` for Apache's Virtual Hosts.
 
 ## Example Project 
 
@@ -496,7 +460,6 @@ services:
       WORDPRESS_DB_PASSWORD: ""
       WORDPRESS_DB_NAME: ${COMPOSE_PROJECT_NAME}
       SITE_URL: https://${COMPOSE_PROJECT_NAME}.test
-      SITE_NAME: ${COMPOSE_PROJECT_NAME}
     volumes:
       - ./wordpress:/var/www/html
     labels:
