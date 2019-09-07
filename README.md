@@ -345,6 +345,30 @@ Furthermore, just like when creating a new project, you must ensure that the fol
 - Labels: 
   * Router/service name(s)
   * Host rule domain name(s)
+  
+---
+
+### Adding custom Virtual Host file.
+
+The current Virtual Host file that is copied in to the image at run time looks like this: 
+
+```
+<VirtualHost *:5000>
+DocumentRoot /var/www/html
+ErrorLog ${APACHE_LOG_DIR}/errors.log
+CustomLog ${APACHE_LOG_DIR}/access.log combined
+ServerName
+<Directory /var/www/html>
+    Options Indexes FollowSymLinks
+    AllowOverride All
+    Require all granted
+</Directory>
+</VirtualHost>
+```
+
+If you need to add a custom Virtual Host file you must mount the file as a volume to the `/tmp` directory with a `.conf` suffix. For example:
+
+`- ./vhost.conf:/tmp/vhost.conf`
 
 ---
 
