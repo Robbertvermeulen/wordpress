@@ -1,5 +1,5 @@
 #!/bin/bash
-set -euo pipefail
+set -e
 
 echo "wating for mysql..."
 mysqladmin ping -u${WORDPRESS_DB_USER} -h${WORDPRESS_DB_HOST:-mysql} -p${WORDPRESS_DB_PASSWORD:-} --silent --wait
