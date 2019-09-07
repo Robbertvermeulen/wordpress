@@ -180,7 +180,7 @@ Now we need to update our `wordpress` service to include its own custom domain n
       `${COMPOSE_PROJECT_NAME}.test`, `www.${COMPOSE_PROJECT_NAME}.test`)
     ```
 
-    > **Note**: `www.` was added to our Virtual Host as a ServerAlias at build time. We have, therefore, added it to our Host rule as a subdomain. If you would like to have different services running on other subdomains it is recommended that you add a separate service to your compose file (see the section called "Adding Wordpress to a subdomain" below for more information on how to achieve this).
+    > **Note**: If you would like to have different services running on other subdomains it is recommended that you add a separate service to your compose file (see the section called "Adding Wordpress to a subdomain" below for more information on how to achieve this).
 
 1. Change the value of `SITE URL` to include `.test`: 
 
@@ -189,7 +189,8 @@ Now we need to update our `wordpress` service to include its own custom domain n
     ```
 
 1. Next, we need to remove the Wordpress project and its respective mysql volume so that we can re-install a new Wordpress project using the new domain names. 
-    > You could manually change the settings inside the Wordpress dashboard but, for now, let's just create a new project. 
+    > You could manually change the settings inside the Wordpress dashboard but, for now, let's just create a new project.
+
     ```
     rm -rf ./wordpress
     docker volume rm <project_directory_name>_mysql
@@ -266,9 +267,9 @@ Now we need to update our containers to include this feature. Let's start by edi
       `${COMPOSE_PROJECT_NAME}.test`, `www.${COMPOSE_PROJECT_NAME}.test`)
     ```
 
-1. Finally, update the `$SITE_URL` environment variable from `http://` to `https://`
+1. Finally, update the `$SITE_URL` environment variable from `http://` to `https://`.
 
-1. Run `docker-compose up -d` to run.
+1. Run `docker-compose up -d`.
 
 1. You can now visit `https://example.test` to see your instance of Wordpress running using the HTTPS protocol.
 
@@ -380,17 +381,17 @@ You can then run `docker-compose up -d --build` to build your container with the
 > Run MySQL with a password.
 *Important*: You must choose either one or the other.
 
-#### For wordpress service:
-* `WORDPRESS_DB_HOST: mysql`
-> *Optional*: The name of our mysql service acts as its hostname. Change this if you have named your service differently or you are running multiple mysql services. Defaults to `mysql`.    
+#### For wordpress service:  
 * `WORDPRESS_DB_USER: root`
 > *Mandatory*: Needed so that the Wordpress instance can create database entries. 
 * `WORDPRESS_DB_PASSWORD: password`
 > *Mandatory*: Needed so that the Wordpress instance can create database entries. Must match `MYSQL_ROOT_PASSWORD` (if used). If `MYSQL_ALLOW_EMPTY_PASSWORD` is used please input: `WORDPRESS_DB_PASSWORD: ""`
-* `WORDPRESS_DB_NAME: exampleDatabase`
+* `WORDPRESS_DB_NAME: example`
 > *Mandatory*: Creates a database using this name.
 * `SITE_URL: https://example.test`
-> *Mandatory*: Sets the website name inside Wordpress and is also used as a basis to set the `ServerName` and `ServerAlias` for Apache's Virtual Hosts.
+> *Mandatory*: Sets the website name inside Wordpress and is also used as a basis to set the `ServerName` for Apache's Virtual Hosts.
+* `WORDPRESS_DB_HOST: mysql`
+> *Optional*: The name of our mysql service acts as its hostname. Change this if you have named your service differently or you are running multiple mysql services. Defaults to `mysql`.
 
 ## Example Project 
 
